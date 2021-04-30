@@ -68,9 +68,11 @@ function! CompileSomeRust()
         if l:error_count > 0
             copen 6
         else
+            cclose
             echo "no errors (" . warning_count . " warnings)..."
         endif
     else
+        cclose
         echo "no errors..."
     endif
 endfunction
