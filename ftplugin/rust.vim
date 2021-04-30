@@ -1,7 +1,7 @@
-if exists('g:florp_loaded')
+if exists('g:togglerust_loaded')
     finish
 endif
-let g:florp_loaded = 1 
+let g:togglerust_loaded = 1 
 
 " -----------------------------------------------------------------------------
 "     - Rust help -
@@ -33,19 +33,25 @@ function! CompileSomeRust()
 
     let qflist = getqflist()
     let l:error_count = 0
+    let l:warning_count = 0
     if len(qflist) > 0
         " Check for type W
         " Ignore everything until we get an E
         let l:collect_err = 0
         let l:new_qf_list = []
         for i in qflist 
+            " Count number of warnings
             if i.type == "W"
+                if (i.text =~ '\d warnings emitted')
+                    let l:warning_count = split(i.text)[0]
+                endif
                 let l:collect_err = 0
             endif
 
+            " Count errors
             if i.type == "E"
                 let l:collect_err = 1
-                let l:error_count = l:error_count + 1
+                let l:error_count += 1
             endif
 
             " Add errors to the new quickfix list
@@ -57,10 +63,12 @@ function! CompileSomeRust()
 
         call setqflist(new_qf_list)
 
+        " If we have errors then open the quickfix window
+        " otherwise display the number of warnings
         if l:error_count > 0
-            copen
+            copen 6
         else
-            echo "no errors..."
+            echo "no errors (" . warning_count . " warnings)..."
         endif
     else
         echo "no errors..."
