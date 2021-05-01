@@ -67,6 +67,7 @@ function! CompileSomeRust()
         " otherwise display the number of warnings
         if l:error_count > 0
             copen 6
+            wincmd p
         else
             cclose
             echo "no errors (" . warning_count . " warnings)..."
