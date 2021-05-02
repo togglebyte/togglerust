@@ -63,19 +63,22 @@ function! CompileSomeRust()
 
         call setqflist(new_qf_list)
 
-        " If we have errors then open the quickfix window
-        " otherwise display the number of warnings
-        if l:error_count > 0
-            copen 6
-            wincmd p
-        else
-            cclose
-            echo "no errors (" . warning_count . " warnings)..."
-        endif
+    endif
+
+    " If we have errors then open the quickfix window
+    " otherwise display the number of warnings
+    if l:error_count > 0
+        copen 6
+        wincmd p
     else
         cclose
-        echo "no errors..."
+        if (l:warning_count > 0) 
+            echo "no errors | " . warning_count . " warnings"
+        else
+            echo "no errors..."
+        endif
     endif
+
 endfunction
 
 :command! Compile call CompileSomeRust()
