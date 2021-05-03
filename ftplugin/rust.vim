@@ -45,6 +45,9 @@ function! CompileSomeRust()
                 if (i.text =~ '\d warnings emitted')
                     let l:warning_count = split(i.text)[0]
                 endif
+                if (i.text =~ '1 warning emitted')
+                    let l:warning_count = 1
+                endif
                 let l:collect_err = 0
             endif
 
@@ -72,11 +75,7 @@ function! CompileSomeRust()
         wincmd p
     else
         cclose
-        if (l:warning_count > 0) 
-            echo "no errors | " . warning_count . " warnings"
-        else
-            echo "no errors..."
-        endif
+	echo "E: " . error_count . " | W: " . warning_count
     endif
 
 endfunction
