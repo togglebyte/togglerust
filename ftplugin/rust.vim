@@ -73,6 +73,8 @@ function! CompileSomeRust()
     if l:error_count > 0
         copen 6
         wincmd p
+	cfirst
+	echo "E: " . error_count . " | W: " . warning_count
     else
         cclose
 	echo "E: " . error_count . " | W: " . warning_count
