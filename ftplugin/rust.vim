@@ -4,6 +4,12 @@ endif
 let g:togglerust_loaded = 1 
 
 " -----------------------------------------------------------------------------
+"     - Highlight groups -
+" -----------------------------------------------------------------------------
+highlight ToggleRustErr ctermbg=0 ctermfg=1
+highlight ToggleRustWarn ctermbg=0 ctermfg=3
+
+" -----------------------------------------------------------------------------
 "     - Rust help -
 " -----------------------------------------------------------------------------
 function! RustDocs()
@@ -74,11 +80,19 @@ function! CompileSomeRust()
         copen 6
         wincmd p
 	cfirst
-	echo "E: " . error_count . " | W: " . warning_count
     else
         cclose
-	echo "E: " . error_count . " | W: " . warning_count
     endif
+
+    let l:err_out = "echo 'E: " . error_count . "'"
+    if l:error_count > 0 
+	let l:err_out = "echohl ToggleRustErr | echo 'E: " . error_count . "' | echohl None"
+    endif
+    let l:warn_out = " | echon ' | W: " . warning_count . "'"
+    if l:warning_count > 0 
+	let l:warn_out = "| echon ' | ' | echohl ToggleRustWarn | echon 'W: " . warning_count . "' | echohl None"
+    endif
+    exec err_out . warn_out
 
 endfunction
 
@@ -90,93 +104,95 @@ endfunction
 " -----------------------------------------------------------------------------
 let termdebugger="rust-gdb"
 
-" " Find rust function name
-" " Taken from rust.vim (https://github.com/rust-lang/rust.vim)
-" let g:vebugger_path_gdb = 'rust-gdb'
-" function! FindTestFunctionNameUnderCursor() abort
-"     let cursor_line = line('.')
+let g:vebugger_path_gdb = 'rust-gdb'
 
-"     " Find #[test] attribute
-"     if search('\m\C#\[test\]', 'bcW') is 0
-"         return ''
-"     endif
+" Find rust function name
+" Taken from rust.vim (https://github.com/rust-lang/rust.vim)
+function! FindTestFunctionNameUnderCursor() abort
+    let cursor_line = line('.')
 
-"     " Move to an opening brace of the test function
-"     let test_func_line = search('\m\C^\s*fn\s\+\h\w*\s*(.\+{$', 'eW')
-"     if test_func_line is 0
-"         return ''
-"     endif
+    " Find #[test] attribute
+    if search('\m\C#\[test\]', 'bcW') is 0
+        return ''
+    endif
 
-"     " Search the end of test function (closing brace) to ensure that the
-"     " cursor position is within function definition
-"     normal! %
-"     if line('.') < cursor_line
-"         return ''
-"     endif
+    " Move to an opening brace of the test function
+    let test_func_line = search('\m\C^\s*fn\s\+\h\w*\s*(.\+{$', 'eW')
+    if test_func_line is 0
+        return ''
+    endif
 
-"     return matchstr(getline(test_func_line), '\m\C^\s*fn\s\+\zs\h\w*')
-" endfunction
+    " Search the end of test function (closing brace) to ensure that the
+    " cursor position is within function definition
+    normal! %
+    if line('.') < cursor_line
+        return ''
+    endif
 
-" function FindTestExecutable(test_func_name) abort
-"     let l:command = 'cargo test ' . a:test_func_name . ' -v'
-"     let l:test_output = system(command)
-"     let l:lines = reverse(split(test_output, '\n'))
+    return matchstr(getline(test_func_line), '\m\C^\s*fn\s\+\zs\h\w*')
+endfunction
 
-"     let l:use_next=0
-"     for line in lines
-"         if (line=~'Running')
-"             let l:fragments = split(line)
+function FindTestExecutable(test_func_name) abort
+    let l:command = 'cargo test ' . a:test_func_name . ' -v'
+    let l:test_output = system(command)
+    let l:lines = reverse(split(test_output, '\n'))
 
-"             " Use this line to get the path to the executable
-"             if l:use_next > 0 
-"                 let l:test_exec = split(fragments[1], '`')[0]
-"                 if len(fragments) < 3
-"                     return test_exec
-"                 endif
-"                 let l:test_name = split(fragments[2], '`')[0]
-"                 return test_exec
-"             endif
+    let l:use_next=0
+    for line in lines
+        if (line=~'Running')
+            let l:fragments = split(line)
 
-"             " If there was more than zero tests run
-"             " use the next available executable
-"             if str2nr(fragments[1]) > 0
-"                 let l:use_next = 1
-"             endif
-"         endif
-"     endfor 
+            " Use this line to get the path to the executable
+            if l:use_next > 0 
+                let l:test_exec = split(fragments[1], '`')[0]
+                if len(fragments) < 3
+                    return test_exec
+                endif
+                let l:test_name = split(fragments[2], '`')[0]
+                return test_exec
+            endif
 
-"     return ''
-" endfunction
+            " If there was more than zero tests run
+            " use the next available executable
+            if str2nr(fragments[1]) > 0
+                let l:use_next = 1
+            endif
+        endif
+    endfor 
 
-" " function RunDebuggerFromTest()
-" function RunDebugger()
-"     let l:test_func_name = FindTestFunctionNameUnderCursor()
-"     echo l:test_func_name
+    return ''
+endfunction
 
-"     if len(l:test_func_name)
-"         let l:test_bin_path = FindTestExecutable(l:test_func_name)
-"         call vebugger#gdb#start(l:test_bin_path , {'args': [l:test_func_name], 'entry':l:test_func_name})
-"     else
-"         call RunDebuggerFromMain()
-"     endif
+function RunDebugger()
+    let l:test_func_name = FindTestFunctionNameUnderCursor()
+    echo l:test_func_name
 
-" endfunction
+    if len(l:test_func_name)
+        let l:test_bin_path = FindTestExecutable(l:test_func_name)
+        call vebugger#gdb#start(l:test_bin_path , {'args': [l:test_func_name], 'entry':l:test_func_name})
+    else
+        call RunDebuggerFromMain()
+    endif
 
-" function DebugProject()
-"     let l:path_fragments = split(getcwd(), '/')
-"     let l:project_name = path_fragments[-1]
-"     let l:bin_dir = 'target/debug/'
-"     let l:bin_path = bin_dir . project_name
-"     if filereadable(bin_path)
-"         let l:command = ':VBGstartGDB ' . bin_path
-"         execute command
-"     endif
-" endfunction
+endfunction
 
-" function RunDebuggerFromMain()
-"     echo "building ..."
-"     " Build project to ensure we have target/debug
-"     let l:command = 'cargo build'
-"     let l:output = system(command)
-"     call DebugProject()
-" endfunction
+function DebugProject()
+    let l:path_fragments = split(getcwd(), '/')
+    let l:project_name = path_fragments[-1]
+    let l:bin_dir = 'target/debug/'
+    let l:bin_path = bin_dir . project_name
+    if filereadable(bin_path)
+        let l:command = ':Termdebug ' . bin_path
+	exec command
+	normal! i
+	normal! start
+    endif
+endfunction
+
+function RunDebuggerFromMain()
+    echo "building ..."
+    " Build project to ensure we have target/debug
+    let l:command = 'cargo build'
+    let l:output = system(command)
+    call DebugProject()
+endfunction
