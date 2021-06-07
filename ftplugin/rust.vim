@@ -12,22 +12,22 @@ highlight ToggleRustWarn ctermbg=0 ctermfg=3
 " -----------------------------------------------------------------------------
 "     - Rust help -
 " -----------------------------------------------------------------------------
-function! RustDocs()
-    let l:word = expand("<cword>")
-    :call RustMan(word)
-endfunction
+" function! RustDocs()
+"     let l:word = expand("<cword>")
+"     :call RustMan(word)
+" endfunction
 
-function! RustMan(word)
-    if has('nvim')
-        let l:command  = ':term rusty-man ' . a:word
-    else
-        let l:command  = ':term ++close rusty-man ' . a:word
-    endif
+" function! RustMan(word)
+"     if has('nvim')
+"         let l:command  = ':term rusty-man ' . a:word
+"     else
+"         let l:command  = ':term ++close rusty-man ' . a:word
+"     endif
 
-    execute command
-endfunction
+"     execute command
+" endfunction
 
-:command! -nargs=1 Rman call RustMan(<f-args>)
+" :command! -nargs=1 Rman call RustMan(<f-args>)
 
 " -----------------------------------------------------------------------------
 "     - Compiling -
@@ -103,8 +103,8 @@ endfunction
 "     - Debug stuff -
 " -----------------------------------------------------------------------------
 let termdebugger="rust-gdb"
+let g:termdebug_useFloatingHover = 0
 
-let g:vebugger_path_gdb = 'rust-gdb'
 
 " Find rust function name
 " Taken from rust.vim (https://github.com/rust-lang/rust.vim)
@@ -169,11 +169,14 @@ function RunDebugger()
 
     if len(l:test_func_name)
         let l:test_bin_path = FindTestExecutable(l:test_func_name)
-        call vebugger#gdb#start(l:test_bin_path , {'args': [l:test_func_name], 'entry':l:test_func_name})
+        let l:command = ':Termdebug ' . test_bin_path
+        exec command
     else
         call RunDebuggerFromMain()
     endif
 
+    wincmd p
+    normal k
 endfunction
 
 function DebugProject()
@@ -183,9 +186,9 @@ function DebugProject()
     let l:bin_path = bin_dir . project_name
     if filereadable(bin_path)
         let l:command = ':Termdebug ' . bin_path
-	exec command
-	normal! i
-	normal! start
+        exec command
+
+        wincmd p
     endif
 endfunction
 
@@ -195,4 +198,11 @@ function RunDebuggerFromMain()
     let l:command = 'cargo build'
     let l:output = system(command)
     call DebugProject()
+endfunction
+
+:command! DebugTest call RunDebugger()
+:command! DebugMain call DebugProject()
+
+function DeleteBreakPoint(bp)
+    :call TermDebugSendCommand('delete ' . a:bp)
 endfunction
