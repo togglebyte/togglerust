@@ -201,7 +201,7 @@ function RunDebuggerFromMain()
 endfunction
 
 :command! DebugTest call RunDebugger()
-:command! DebugMain call DebugProject()
+:command! DebugMain call RunDebuggerFromMain()
 
 function DeleteBreakPoint(bp)
     :call TermDebugSendCommand('delete ' . a:bp)
