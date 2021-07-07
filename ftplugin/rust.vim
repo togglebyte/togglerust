@@ -33,7 +33,7 @@ highlight ToggleRustWarn ctermbg=0 ctermfg=3
 "     - Compiling -
 " -----------------------------------------------------------------------------
 function! CompileSomeRust()
-    echo "compiling..."
+    echo "cargo check..."
     silent make! check
     redraw!
 
@@ -102,7 +102,7 @@ endfunction
 " -----------------------------------------------------------------------------
 "     - Debug stuff -
 " -----------------------------------------------------------------------------
-let termdebugger="rust-gdb"
+let g:termdebugger="rust-gdb"
 let g:termdebug_useFloatingHover = 0
 
 
