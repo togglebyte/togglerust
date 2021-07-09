@@ -1,7 +1,7 @@
-if exists('g:togglerust_loaded')
+if exists('g:ft_togglerust_loaded')
     finish
 endif
-let g:togglerust_loaded = 1 
+let g:ft_togglerust_loaded = 1 
 
 " -----------------------------------------------------------------------------
 "     - Highlight groups -
