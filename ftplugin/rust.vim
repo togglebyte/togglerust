@@ -77,7 +77,7 @@ function! CompileSomeRust()
     " If we have errors then open the quickfix window
     " otherwise display the number of warnings
     if l:error_count > 0
-        copen 6
+        botright copen 6
         wincmd p
 	cfirst
     else
