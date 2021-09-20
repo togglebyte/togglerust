@@ -48,12 +48,7 @@ function! CompileSomeRust()
         for i in qflist 
             " Count number of warnings
             if i.type == "W"
-                if (i.text =~ '\d warnings emitted')
-                    let l:warning_count = split(i.text)[0]
-                endif
-                if (i.text =~ '1 warning emitted')
-                    let l:warning_count = 1
-                endif
+                let l:warning_count += 1
                 let l:collect_err = 0
             endif
 
@@ -77,7 +72,8 @@ function! CompileSomeRust()
     " If we have errors then open the quickfix window
     " otherwise display the number of warnings
     if l:error_count > 0
-        botright copen 6
+        " botright copen 6
+        copen 6
         wincmd p
 	cfirst
     else
