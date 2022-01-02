@@ -196,9 +196,19 @@ function RunDebuggerFromMain()
     call DebugProject()
 endfunction
 
+
+function RunDebugAndBreak()
+    " Set a breakpoint if the debugger is running
+    " otherwise start the debugger and then set the breakpoint
+    if g:TermDebugging > 0
+        exec ':Break'
+    else
+        call RunDebuggerFromMain()
+        exec ':Break'
+        exec ':Run'
+    endif
+endfunction
+
 :command! DebugTest call RunDebugger()
 :command! DebugMain call RunDebuggerFromMain()
-
-function DeleteBreakPoint(bp)
-    :call TermDebugSendCommand('delete ' . a:bp)
-endfunction
+:command! DebugAndBreak call RunDebugAndBreak()
