@@ -129,7 +129,7 @@ function! FindTestFunctionNameUnderCursor() abort
 endfunction
 
 function FindTestExecutable(test_func_name) abort
-    let l:command = 'cargo test ' . a:test_func_name . ' -v'
+    let l:command = 'cargo test -j1 ' . a:test_func_name . ' -v'
     let l:test_output = system(command)
     let l:lines = reverse(split(test_output, '\n'))
 
@@ -160,6 +160,7 @@ function FindTestExecutable(test_func_name) abort
 endfunction
 
 function RunDebugger()
+    let l:line_nr = line(".")
     let l:test_func_name = FindTestFunctionNameUnderCursor()
     echo l:test_func_name
 
@@ -173,6 +174,11 @@ function RunDebugger()
 
     wincmd p
     normal k
+    " jump to the line nr where the debug was called from
+    let l:jump_command = ':' . line_nr
+    exec jump_command
+    :Break
+    :Run
 endfunction
 
 function DebugProject()
