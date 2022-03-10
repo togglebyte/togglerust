@@ -162,7 +162,7 @@ endfunction
 function RunDebugger()
     let l:line_nr = line(".")
     let l:test_func_name = FindTestFunctionNameUnderCursor()
-    echo l:test_func_name
+    echo "Debugging: " . l:test_func_name
 
     if len(l:test_func_name)
         let l:test_bin_path = FindTestExecutable(l:test_func_name)
@@ -178,6 +178,8 @@ function RunDebugger()
     let l:jump_command = ':' . line_nr
     exec jump_command
     :Break
+    :Program
+    :hide
     :Run
 endfunction
 
