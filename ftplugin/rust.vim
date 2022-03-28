@@ -46,8 +46,10 @@ function! CompileSomeRust()
         let l:collect_err = 0
         let l:new_qf_list = []
         for i in qflist 
+
             " Count number of warnings
-            if i.type == "W"
+            if i.type == "W" && i.text !~ ".*generated\\s\\d*\\swarning"
+            " if i.type == "W"
                 let l:warning_count += 1
                 let l:collect_err = 0
             endif
