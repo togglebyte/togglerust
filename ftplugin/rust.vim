@@ -200,6 +200,14 @@ function DebugProject()
     let l:project_name = path_fragments[-1]
     let l:bin_dir = 'target/debug/'
     let l:bin_path = bin_dir . project_name
+
+
+    " If there is no 'target/debug' perhaps this is a workspace?
+    " Try the parent dir
+    if !filereadable(bin_dir . project_name)
+       let l:bin_path = '../target/debug/' . project_name
+    endif
+
     if filereadable(bin_path)
         let l:command = ':Termdebug ' . bin_path
         exec command
@@ -224,8 +232,8 @@ function RunDebugAndBreak()
         exec ':Break'
     else
         call RunDebuggerFromMain()
-        exec ':Break'
-        exec ':Run'
+        :Break
+        :Run
     endif
 endfunction
 
