@@ -141,7 +141,7 @@ function! FindTestFunctionNameUnderCursor() abort
 endfunction
 
 function FindTestExecutable(test_func_name) abort
-    let l:command = 'cargo test --features testing -j1 ' . a:test_func_name . ' -v'
+    let l:command = 'cargo test --all-features ' . a:test_func_name . ' -v'
     let l:test_output = system(command)
     let l:lines = reverse(split(test_output, '\n'))
 
