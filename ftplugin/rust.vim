@@ -6,8 +6,8 @@ let g:ft_togglerust_loaded = 1
 " -----------------------------------------------------------------------------
 "     - Highlight groups -
 " -----------------------------------------------------------------------------
-highlight ToggleRustErr ctermbg=0 ctermfg=1
-highlight ToggleRustWarn ctermbg=0 ctermfg=3
+highlight ToggleRustErr ctermfg=1
+highlight ToggleRustWarn ctermfg=3
 
 " -----------------------------------------------------------------------------
 "     - Rust help -
