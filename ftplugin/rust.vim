@@ -119,13 +119,13 @@ let g:termdebug_useFloatingHover = 0
 function! FindTestFunctionNameUnderCursor() abort
     let cursor_line = line('.')
 
-    " Find #[test] attribute
-    if search('\m\C#\[test\]', 'bcW') is 0
+    " Find #[test] or #[tokio::test] attribute
+    if search('\m\C#\[\(test\|tokio::test\)\]', 'bcW') is 0
         return ''
     endif
 
     " Move to an opening brace of the test function
-    let test_func_line = search('\m\C^\s*fn\s\+\h\w*\s*(.\+{$', 'eW')
+    let test_func_line = search('\m\C^\s*\(fn\|async fn\)\s\+\h\w*\s*(.\+{$', 'eW')
     if test_func_line is 0
         return ''
     endif
@@ -137,7 +137,7 @@ function! FindTestFunctionNameUnderCursor() abort
         return ''
     endif
 
-    return matchstr(getline(test_func_line), '\m\C^\s*fn\s\+\zs\h\w*')
+    return matchstr(getline(test_func_line), '\m\C^\s*\(fn\|async fn\)\s\+\zs\h\w*')
 endfunction
 
 function FindTestExecutable(test_func_name) abort
