@@ -10,26 +10,6 @@ highlight ToggleRustErr ctermfg=1
 highlight ToggleRustWarn ctermfg=3
 
 " -----------------------------------------------------------------------------
-"     - Rust help -
-" -----------------------------------------------------------------------------
-" function! RustDocs()
-"     let l:word = expand("<cword>")
-"     :call RustMan(word)
-" endfunction
-
-" function! RustMan(word)
-"     if has('nvim')
-"         let l:command  = ':term rusty-man ' . a:word
-"     else
-"         let l:command  = ':term ++close rusty-man ' . a:word
-"     endif
-
-"     execute command
-" endfunction
-
-" :command! -nargs=1 Rman call RustMan(<f-args>)
-
-" -----------------------------------------------------------------------------
 "     - Compiling -
 " -----------------------------------------------------------------------------
 function! CompileSomeRust()
@@ -94,11 +74,6 @@ function! CompileSomeRust()
     if l:warning_count > 0 
         let l:warn_out = "| echon ' | ' | echohl ToggleRustWarn | echon 'W: " . warning_count . "' | echohl None"
     endif
-
-    " if l:error_count == 0 && l:warning_count == 0
-    "     let l:err_out = "echo '- 💖 -'"
-    "     let l:warn_out = ''
-    " endif
 
     exec err_out . warn_out
 
